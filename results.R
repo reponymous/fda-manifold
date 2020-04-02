@@ -6,17 +6,17 @@ library(ggplot2)
 library(latex2exp)
 library(stringr)
 
-source("functions.R")
-source("embedding_class.R")
-source("optim_embedding.R")
-source("results_ancillary-code.R")
+source("utils/functions.R")
+source("utils/embedding_class.R")
+source("utils/optim_embedding.R")
+source("utils/results_ancillary-code.R")
 
 # load raw data, dist matrices and tuning results and merge results
 
-load("~/R/fda-manifold/distance_matrices.RData")
-load("~/R/fda-manifold/sim_data.RData")
-load("~/R/fda-manifold/data/optimized_embeddings_nongeo.RData")
-load("~/R/fda-manifold/data/optimized_embeddings_geo.RData")
+load("data/distance_matrices.RData")
+load("data/sim_data.RData")
+load("data/optimized_embeddings_nongeo.RData")
+load("data/optimized_embeddings_geo.RData")
 
 # merge results
 df_res_nongeo <- do.call(rbind, opt_emb_nongeo)
@@ -166,6 +166,34 @@ for (i in seq_along(fig4_plt)) {
 plot_grid(plotlist = fig4_plt, nrow = 3, ncol = 5)
 # -----
 
+tt1 <- get_optvals(nl_dats_l2, space = "fs")  %>% filter(method != "isomap")
+tt2 <- get_optvals(nl_dats_l2, space = "ps")  %>% filter(method != "isomap")
+tt3 <- get_optvals(nl_geo_dats_l2, space = "fs")  %>% filter(method != "isomap")
+tt4 <- get_optvals(nl_geo_dats_l2, space = "ps")  %>% filter(method != "isomap")
+
+df_geo <- data.frame(c("diffmap", "tsne", "umap"),
+                     c("eps.val", "perplexity", "k"))
+for (dt in paste0("tt", rep(1:4))) {
+  if (dt %in% c("tt1", "tt2")) {
+    excl <- "l2_sr_df3_a"
+  } else {
+    excl <- "geo_l2_sr_df3_a"
+  }
+  temp <- 
+    get(dt) %>%
+    filter(data != !!excl) %>%
+    group_by(method) %>%
+    summarize(mean = mean(k)) %>%
+    pull(mean) %>%
+    round(digits = 2)
+  
+  df_geo <- cbind(df_geo, temp)
+}
+
+names(df_geo) <- c("method", "lp", "l2_fs", "l2_ps", "geo_fs", "geo_ps")
+df_diffs <- df_geo %>% mutate(l2 = abs(l2_fs - l2_ps), geo = abs(geo_fs - geo_ps))
+kableExtra::kable(df_diffs[, c(1, 2, 7, 8)], "latex", digits = 2, align = "l")
+
 # Tab 4 -----------------------------------------------------------------------
 tt1 <- get_optvals(nl_dats_l2, space = "fs")  %>% filter(method != "isomap")
 tt2 <- get_optvals(nl_dats_l2, space = "ps")  %>% filter(method != "isomap")
@@ -204,6 +232,15 @@ kableExtra::kable(df_diffs[, c(1, 2, 7, 8)], "latex", digits = 2, align = "l")
 # ----
 
 # Sub Fig 1 ------
+sup_fig1_dat <- get_optvals(nl_dats_l2, space = "ps") %>% filter(method != "isomap")
+
+sup_fig1_plots <- list_plots(sup_fig1_dat)
+sup_fig1 <- nice_plts(sup_fig1_plots) 
+for (i in seq_along(sup_fig1)) {
+  sup_fig1[[i]] <- sup_fig1[[i]] + emb_labs
+}
+
+plot_grid(plotlist = sup_fig1, nrow = 6, ncol = 3)
 # ----
 
 # Sub Fig 2 -----
