@@ -13,12 +13,15 @@ source("utils/results_ancillary-code.R")
 
 # load raw data, dist matrices and tuning results and merge results
 
-load("data/distance_matrices.RData")
+load("data/distance_matrices1.RData")
+load("data/distance_matrices2.RData")
 load("data/sim_data.RData")
 load("data/optimized_embeddings_nongeo.RData")
 load("data/optimized_embeddings_geo.RData")
 
 # merge results
+dist_list <- c(dist_list1, dist_list2) # spitted to fit in GitHub
+
 df_res_nongeo <- do.call(rbind, opt_emb_nongeo)
 df_res_geo <- do.call(rbind, opt_emb_geo)
 
