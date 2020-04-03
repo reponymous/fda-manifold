@@ -6,7 +6,7 @@ library(ggplot2)
 library(latex2exp)
 library(stringr)
 
-source("utils/functions.R")
+source("utils/setup.R")
 source("utils/embedding_class.R")
 source("utils/optim_embedding.R")
 source("utils/results_ancillary-code.R")
@@ -20,7 +20,7 @@ load("data/optimized_embeddings_nongeo.RData")
 load("data/optimized_embeddings_geo.RData")
 
 # merge results
-dist_list <- c(dist_list1, dist_list2) # spitted to fit in GitHub
+dist_list <- c(dist_list1, dist_list2) # splitted to fit in GitHub
 
 df_res_nongeo <- do.call(rbind, opt_emb_nongeo)
 df_res_geo <- do.call(rbind, opt_emb_geo)
@@ -37,16 +37,15 @@ nl_dats_l2 <- c("l2_sr_df2_a", "l2_hx_df3_a", "l2_sr_df3_a",
 nl_geo_dats_l2 <- c("geo_l2_sr_df2_a",  "geo_l2_hx_df3_a", "geo_l2_sr_df3_a",
                     "geo_l2_sc_df3_a",  "geo_l2_tp_df3_a")
 
+ex_labs <- list(xlab("t"), ylab("x(t)"))
+emb_labs <- list(xlab(TeX("y_1")), ylab(TeX("y_2")))
 
 
-# for exact repodcution of the plots using the stored data
+# for exact reproduction of the results
 seed <- 42 
 
 
 # Section 3: Study design ------------------------------------------------------
-
-ex_labs <- list(xlab("t"), ylab("x(t)"))
-emb_labs <- list(xlab(TeX("y_1")), ylab(TeX("y_2")))
 
 # Fig 1 -----
 
@@ -115,6 +114,9 @@ plot_grid(plot_row(rows = 1:3, labels_l[1:3], fig2_plts[1:3]),
 # ----
 
 # Fig 3 -----------------------------------------------------------------------
+nl_optl2_fs <- get_optvals(nl_dats_l2, meas = "auc_rnx", space = "fs") %>% arrange(method)
+nl_optl2_ps <- get_optvals(nl_dats_l2, meas = "auc_rnx", space = "ps") %>% arrange(method)
+
 fig3_r1 <- nl_optl2_fs %>% filter(method == "isomap")
 fig3_r2 <- nl_optl2_ps %>% filter(method == "isomap")
 
@@ -232,10 +234,14 @@ kableExtra::kable(df_diffs[, c(1, 2, 7, 8)], "latex", digits = 2, align = "l")
 # Supplement ------------------------------------------------------------------
 
 # Sup Tab 1 ------
+get_optvals(nl_dats_l2, meas = "auc_rnx", space = "fs") %>% arrange(method) %>%
+  summarize(mean(k))
+get_optvals(nl_dats_l2, meas = "q_global", space = "fs") %>% arrange(method) %>%
+  summarize(mean(k))
 # ----
 
 # Sub Fig 1 ------
-sup_fig1_dat <- get_optvals(nl_dats_l2, space = "ps") %>% filter(method != "isomap")
+sup_fig1_dat <- get_optvals(l_data_l2, space = "ps") %>% filter(method != "isomap")
 
 sup_fig1_plots <- list_plots(sup_fig1_dat)
 sup_fig1 <- nice_plts(sup_fig1_plots) 
@@ -247,8 +253,25 @@ plot_grid(plotlist = sup_fig1, nrow = 6, ncol = 3)
 # ----
 
 # Sub Fig 2 -----
-# ----
+sup_fig2_dat <- get_optvals(nl_dats_l2, space = "fs") %>% filter(method != "isomap")
+
+sup_fig2_plts <- list_plots(sup_fig2_dat)
+sup_fig2_plt <- nice_plts(sup_fig2_plots)
+for (i in seq_along(sup_fig2_plt)) {
+  sup_fig2_plt[[i]] <- sup_fig2_plt[[i]] + emb_labs
+}
+
+plot_grid(plotlist = sup_fig2_plt, nrow = 3, ncol = 5)
 
 # Sub Fig 3 -----
+sup_fig3_dat <- get_optvals(nl_geo_dats_l2, space = "fs") %>% filter(methods)
+
+sup_fig3_plts <- list_plots(sup_fig3_dat)
+sup_fig3_plt <- nice_plts(sup_fig3_plots)
+for (i in seq_along(sup_fig3_plt)) {
+  sup_fig3_plt[[i]] <- sup_fig3_plt[[i]] + emb_labs
+}
+
+plot_grid(plotlist = sup_fig3_plt, nrow = 5, ncol = 3)
 # ----
 
