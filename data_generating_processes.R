@@ -1,4 +1,5 @@
 # generating data
+source("utils/setup.R")
 
 n_funs <- 1000
 grid_size <- 200

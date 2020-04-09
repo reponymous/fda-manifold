@@ -171,34 +171,6 @@ for (i in seq_along(fig4_plt)) {
 plot_grid(plotlist = fig4_plt, nrow = 3, ncol = 5)
 # -----
 
-tt1 <- get_optvals(nl_dats_l2, space = "fs")  %>% filter(method != "isomap")
-tt2 <- get_optvals(nl_dats_l2, space = "ps")  %>% filter(method != "isomap")
-tt3 <- get_optvals(nl_geo_dats_l2, space = "fs")  %>% filter(method != "isomap")
-tt4 <- get_optvals(nl_geo_dats_l2, space = "ps")  %>% filter(method != "isomap")
-
-df_geo <- data.frame(c("diffmap", "tsne", "umap"),
-                     c("eps.val", "perplexity", "k"))
-for (dt in paste0("tt", rep(1:4))) {
-  if (dt %in% c("tt1", "tt2")) {
-    excl <- "l2_sr_df3_a"
-  } else {
-    excl <- "geo_l2_sr_df3_a"
-  }
-  temp <- 
-    get(dt) %>%
-    filter(data != !!excl) %>%
-    group_by(method) %>%
-    summarize(mean = mean(k)) %>%
-    pull(mean) %>%
-    round(digits = 2)
-  
-  df_geo <- cbind(df_geo, temp)
-}
-
-names(df_geo) <- c("method", "lp", "l2_fs", "l2_ps", "geo_fs", "geo_ps")
-df_diffs <- df_geo %>% mutate(l2 = abs(l2_fs - l2_ps), geo = abs(geo_fs - geo_ps))
-kableExtra::kable(df_diffs[, c(1, 2, 7, 8)], "latex", digits = 2, align = "l")
-
 # Tab 4 -----------------------------------------------------------------------
 tt1 <- get_optvals(nl_dats_l2, space = "fs")  %>% filter(method != "isomap")
 tt2 <- get_optvals(nl_dats_l2, space = "ps")  %>% filter(method != "isomap")
@@ -256,7 +228,7 @@ plot_grid(plotlist = sup_fig1, nrow = 6, ncol = 3)
 sup_fig2_dat <- get_optvals(nl_dats_l2, space = "fs") %>% filter(method != "isomap")
 
 sup_fig2_plts <- list_plots(sup_fig2_dat)
-sup_fig2_plt <- nice_plts(sup_fig2_plots)
+sup_fig2_plt <- nice_plts(sup_fig2_plts)
 for (i in seq_along(sup_fig2_plt)) {
   sup_fig2_plt[[i]] <- sup_fig2_plt[[i]] + emb_labs
 }
@@ -264,10 +236,10 @@ for (i in seq_along(sup_fig2_plt)) {
 plot_grid(plotlist = sup_fig2_plt, nrow = 3, ncol = 5)
 
 # Sub Fig 3 -----
-sup_fig3_dat <- get_optvals(nl_geo_dats_l2, space = "fs") %>% filter(methods)
+sup_fig3_dat <- get_optvals(nl_geo_dats_l2, space = "fs") %>% filter(method != "isomap")
 
 sup_fig3_plts <- list_plots(sup_fig3_dat)
-sup_fig3_plt <- nice_plts(sup_fig3_plots)
+sup_fig3_plt <- nice_plts(sup_fig3_plts)
 for (i in seq_along(sup_fig3_plt)) {
   sup_fig3_plt[[i]] <- sup_fig3_plt[[i]] + emb_labs
 }
