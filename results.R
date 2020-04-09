@@ -171,6 +171,15 @@ for (i in seq_along(fig4_plt)) {
 plot_grid(plotlist = fig4_plt, nrow = 3, ncol = 5)
 # -----
 
+# Tab 3 -----------------------------------------------------------------------
+tab3_dat1 <- get_optvals(nl_dats_l2, meas = "auc_rnx", space = "fs") %>% arrange(method)
+tab3_dat2 <- get_optvals(nl_dats_l2, meas = "auc_rnx", space = "ps") %>% arrange(method)
+
+t3_df_opt_vals <- cbind(tab3_dat1[, c(1:2, 6, 3)], tab3_dat2[, c(6, 3)])
+
+kableExtra::kable(t3_df_opt_vals, "latex", digits = 2, align = "l")
+# ----
+
 # Tab 4 -----------------------------------------------------------------------
 tt1 <- get_optvals(nl_dats_l2, space = "fs")  %>% filter(method != "isomap")
 tt2 <- get_optvals(nl_dats_l2, space = "ps")  %>% filter(method != "isomap")
@@ -234,6 +243,7 @@ for (i in seq_along(sup_fig2_plt)) {
 }
 
 plot_grid(plotlist = sup_fig2_plt, nrow = 3, ncol = 5)
+# ----
 
 # Sub Fig 3 -----
 sup_fig3_dat <- get_optvals(nl_geo_dats_l2, space = "fs") %>% filter(method != "isomap")
